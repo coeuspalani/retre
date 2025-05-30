@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload ML Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Icon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Icon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'Icon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'Icon/site.webmanifest' %}">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --border: #d1d5db;
+            --bg: #f9fafb;
+            --text: #111827;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 40px 35px;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 550px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 15px;
+            color: var(--text);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            outline: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .file-upload:hover {
+            background: #f0f4ff;
+            border-color: var(--primary);
+        }
+
+        .file-upload i {
+            font-size: 30px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        #file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        input[type="submit"] {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: var(--primary-dark);
+        }
+
+        p.message {
+            text-align: center;
+            color: #059669;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            form {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2>Upload Your ML Project</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-group">
+            <label for="project_name">Project Name</label>
+            <input type="text" id="project_name" name="project_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="project_file">Upload All Required Files</label>
+            <label class="file-upload" for="project_file">
+                <i>📁</i>
+                Click to choose .zip, .py, or related files<br>
+                <span id="file-name">No file chosen</span>
+            </label>
+            <input type="file" id="project_file" name="project_file" multiple required placeholder="Upload All required Files for decoding,scaling etc.. ">
+        </div>
+
+        <div class="form-group">
+            <label for="requirements">Requirements (comma-separated)</label>
+            <textarea id="requirements" name="requirements" rows="3" placeholder="e.g., pandas, numpy, sklearn"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Project Description</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+
+        <input type="submit" value="Submit Project">
+
+        <div class="back-link">
+            <a href="/">← Go back to profile</a>
+        </div>
+    </form>
+    {% if checkcomplete %}
+    <script>
+        alert("Project submitted for Review Successfully.Re-directed To Home")
+        window.location.href="/"
+    </script>
+    {% endif %}
+    <script>
+        const fileInput = document.getElementById("project_file");
+        const fileNameDisplay = document.getElementById("file-name");
+
+        fileInput.addEventListener("change", function () {
+        const files = Array.from(fileInput.files);
+        const oversizedFiles = files.filter(file => file.size > 2 * 1024 * 1024); // 2MB limit
+
+        if (oversizedFiles.length > 0) {
+            alert("Each file must be less than 2MB.");
+            fileInput.value = "";
+            fileNameDisplay.textContent = "No file chosen";
+        } else {
+            const fileNames = files.map(file => file.name).join(', ');
+            fileNameDisplay.textContent = fileNames ? `${fileNames} ✅` : "No file chosen";
+        }
+    });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ML Projects Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Icon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Icon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'Icon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'Icon/site.webmanifest' %}">
+  <style>
+    body {
+      background-color: #f9f9f9;
+    }
+    .dashboard-container {
+      max-width: 1200px;
+      margin: auto;
+      padding-top: 40px;
+    }
+    .project-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .project-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+    .creator-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .add-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  <h2 class="mb-4 text-center">Explore Machine Learning Projects</h2>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for project in projects %}
+    <div class="col">
+      <div class="card project-card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex align-items-center mb-3">
+            <img src="{{ project.creator.image.url }}" class="creator-img me-2" onclick="showCreatorDetails({{ project.creator.id }})" alt="Creator">
+            <div>
+              <h5 class="card-title mb-0">{{ project.project_name }}</h5>
+              <small class="text-muted">By {{ project.creator.user.username }}</small>
+            </div>
+          </div>
+          <p class="card-text flex-grow-1">{{ project.description|truncatechars:150 }}</p>
+          <a href="{% url 'project_detail' project.id %}" class="btn btn-primary mt-3">View Details</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if request.user.is_authenticated %}
+  {% with user_role=request.user.userprofile.role %}
+    {% if user_role == "creator" %}
+    <a href="/addmlproject/" class="btn btn-success btn-lg rounded-circle add-btn" title="Add Project">
+      +
+    </a>
+    {% endif %}
+  {% endwith %}
+{% endif %}
+
+<!-- Modal for creator info -->
+<div class="modal fade" id="creatorModal" tabindex="-1" aria-labelledby="creatorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="creatorModalLabel">Creator Info</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="creatorDetails">
+        Loading...
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showCreatorDetails(id) {
+  fetch(`/creator-info/${id}/`)
+    .then(response => response.json())
+    .then(data => {
+      const modalBody = document.getElementById("creatorDetails");
+      modalBody.innerHTML = `
+        <p><strong>Username:</strong> ${data.username}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Role:</strong> ${data.bio}</p>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('creatorModal'));
+      modal.show();
+    })
+    .catch(() => {
+      document.getElementById("creatorDetails").innerHTML = "<p>Error loading creator details.</p>";
+    });
+}
+</script>
+
+</body>
+</html>

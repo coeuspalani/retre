@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ML Project: {{ project.project_name }}</title>
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Icon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Icon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'Icon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'Icon/site.webmanifest' %}">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 60px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      background: #fff;
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      margin: auto;
+    }
+
+    h1 {
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #222;
+      text-align: center;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #444;
+    }
+
+    .form-check-label {
+      margin-left: 0.25rem;
+      user-select: none;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 0.75rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0b5ed7;
+    }
+
+    .result-card {
+      background-color: #e9f5ff;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(0, 94, 184, 0.15);
+      margin-bottom: 1.5rem;
+      color: #0457a0;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      min-width: 140px;
+    }
+
+    /* Style radio button groups nicely */
+    .radio-group {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-group label {
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      color: #555;
+    }
+
+    select.form-select {
+      border-radius: 8px;
+      padding: 0.375rem 0.75rem;
+      font-weight: 600;
+      color: #444;
+      border: 1px solid #ced4da;
+      transition: border-color 0.3s ease;
+    }
+
+    select.form-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ML Project: {{ project.project_name }}</h1>
+
+    {% if not predictcomp %}
+    <form id="predictionForm" method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="mb-4">
+        <label for="feature1" class="form-label">Age</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          id="feature1"
+          name="age"
+          required
+          placeholder="Enter age"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Sex</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="sex" value="male" required /> Male
+          </label>
+          <label>
+            <input type="radio" name="sex" value="female" required /> Female
+          </label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="feature3" class="form-label">BMI</label>
+        <input
+          type="number"
+          step="any"
+          class="form-control"
+          id="feature3"
+          name="bmi"
+          required
+          placeholder="Enter BMI"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="feature4" class="form-label">Number of Children</label>
+        <input
+          type="number"
+          step="1"
+          min="0"
+          class="form-control"
+          id="feature4"
+          name="child"
+          required
+          placeholder="Enter number of children"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Smoker</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="smoker" value="yes" required /> Yes
+          </label>
+          <label>
+            <input type="radio" name="smoker" value="no" required /> No
+          </label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="region" class="form-label">Region</label>
+        <select id="region" name="region" class="form-select" required>
+          <option value="" disabled selected>Select region</option>
+          <option value="southeast">SouthEast</option>
+          <option value="southwest">SouthWest</option>
+          <option value="northeast">NorthEast</option>
+          <option value="northwest">NorthWest</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Predict</button>
+    </form>
+
+    {% else %}
+    <div class="result-card">
+      {{ predictionmsg }}<br />
+      <small class="text-muted">{{ predictionaccuracy }}</small>
+    </div>
+    <div class="btn-group">
+      <a href="/use_project/{{ project.id }}/" class="btn btn-outline-primary btn-sm">
+        Predict Again
+      </a>
+      <a href="/" class="btn btn-outline-primary btn-sm">Back To Dashboard</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+     *{
+            margin:0;
+            box-sizing: border-box;
+        }
+        body{
+
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url("/static/Images/mysignup.jpg");
+            background-attachment:fixed;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 100px;
+        }
+        header
+        {
+            font-family: "Righteous", serif;
+            letter-spacing: 4px;
+            background-color: rgb(27, 25, 25);
+            padding: 10px;
+            opacity: 0.8;
+            width: 100%;
+            position:fixed;
+            top:0;
+            left:0;
+            z-index: 1000;
+        }
+        h1{
+            width:100%;
+            color: white;
+            text-align: center;
+            opacity: 1;
+        }
+        #frm
+        {
+            background-color:whitesmoke;
+            width:50%;
+            border: 1px solid #cccccc;
+            box-shadow: 3px 8px 16px rgba(0, 0, 0, 0.2);
+            margin:100px auto;
+            border-radius: 20px;
+        }
+        p{
+            padding: 10px;
+            font-weight: 800;
+            font-family: "Roboto", serif;
+            font-optical-sizing: auto;
+        }
+        input,textarea{
+            width:90%;
+            margin:10px;
+            margin-top: 0px;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid lightblue;
+        }
+        input::placeholder,textarea::placeholder
+        {
+            font-style: italic;
+        }
+        input:focus,textarea:focus{
+            border-color: #006699;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 102, 153, 0.5);
+        }
+        input:focus::placeholder,textarea:focus::placeholder
+        {
+            color: transparent;
+        }
+        textarea
+        {
+            resize: none;
+            height:70px;
+            width:90%;
+        }
+        button[type="submit"]
+        {
+            margin:30px;
+            width:calc(100% - 60px);
+            padding: 15px;
+            border-radius: 20px;
+            background-color: #003366;
+            border:none;
+            color: #ffffff;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+
+        }
+        button:hover {
+            background-color: #005599;
+            transform: scale(1.02);
+        }
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            padding:10px;
+            margin:10px;
+            margin-top: 0;
+            background-color: aqua;
+            border-radius: 10px;
+        }
+
+        .file-name {
+            margin-top: 0px;
+            font-size: 14px;
+            color: #333;
+            font-style: italic;
+        }
+        .file-label:hover
+        {
+            transform: scale(1.05);
+            background-color: blue;
+            color: aliceblue;
+            box-shadow: 1px 1px 5px rgba(2, 11, 15, 0.5);
+        }
+        .mrg{
+            margin-top: 20px;
+        }
+        .siu{
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .custom-danger{
+            width:80%;
+            margin: auto;
+        }
+        .alert
+        {
+            width: 50%;
+            margin:5px auto;
+        }
+        @media (max-width:600px) {
+            #frm
+            {
+                width:80%;
+            }
+
+        }

@@ -1,0 +1,203 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    display: flex;
+    height: 100vh;
+}
+
+
+h2, h6 {
+    text-align: center;
+}
+
+h2 {
+    margin-top: 10vh;
+}
+
+h6 {
+    margin-top: 4px;
+    margin-bottom: 5vh;
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    padding: 20px;
+    border: 1px solid #cccccc;
+    box-shadow: 3px 8px 16px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+
+.form-1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    color: white;
+    width: 60%;
+    padding: 30px;
+}
+
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin-bottom: 15px;
+}
+
+.input-group p {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+
+.form-2 {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    background-image: url("/static/Images/signin.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 40%;
+    color: ghostwhite;
+}
+
+
+input {
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid lightblue;
+    background-color: black !important;
+    color: white !important;
+}
+
+input::placeholder {
+    font-style: italic;
+}
+
+
+input:focus {
+    border-color: #006699;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 102, 153, 0.5);
+}
+
+input:focus::placeholder {
+    color: transparent;
+}
+
+/* Buttons */
+button[type="submit"] {
+    margin-top: 20px;
+    width: 80%;
+    padding: 15px;
+    border-radius: 20px;
+    background-color: darkred;
+    border: none;
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #a10000;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(161, 0, 0, 0.5);
+}
+
+.len1 {
+    width: 80%;
+    text-align: center;
+}
+
+
+img {
+    height: 30%;
+    width: 100%;
+}
+
+
+.form-2 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    background-image: url("/static/Images/signin.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    width: 40%;
+    height: 100vh;
+    color: ghostwhite;
+    padding: 30px;
+}
+
+/* Add a dark overlay to improve text readability */
+.form-2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+}
+
+.form-2 > * {
+    position: relative;
+    z-index: 2;
+}
+
+.form-2 h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.form-2 p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+.form-2 button {
+    background-color: transparent;
+    border: 2px solid white;
+    padding: 12px 20px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.form-2 button:hover {
+    background-color: white;
+    color: black;
+    transform: scale(1.05);
+}
+a{
+    width:100%;
+}
+.sptr{
+    margin-bottom:7px;
+}
+

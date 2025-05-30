@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creator Signup</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/creatorsignup.css">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Icon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Icon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'Icon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'Icon/site.webmanifest' %}">
+</head>
+<body>
+
+<div class="container-box">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if hidebar %}
+        <div class="mb-3">
+            <label for="uname" class="form-label">Create Username</label>
+            <input type="text" name="uname" id="uname" class="form-control {% if  unamecheck %}u-danger{% endif %}" required autocomplete="off">
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Create Email</label>
+            <input type="email" name="email" id="email" class="form-control {% if  emailcheck %}u-danger{% endif %}" required autocomplete="off">
+        </div>
+
+        <div class="mb-3">
+            <label for="p1" class="form-label">Enter Your New Password</label>
+            <div class="input-group">
+                <input type="password" name="password" id="p1" class="form-control" required>
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('p1', this)">👁</button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="file" class="form-label">Profile Image</label>
+            <input type="file" name="image" id="file" accept="image/*" class="form-control" {% if not imagestatus %}required{% endif %}>
+            <p id="file-name" class="file-name">
+                {% if image %} {{ image.name }} ✅ {% else %} No file chosen {% endif %}
+            </p>
+        </div>
+
+        <button type="submit" name="action" value="req" class="btn btn-primary w-100">Request Verification Code</button>
+
+        {% else %}
+        <div class="mb-3">
+            <label for="ver_code" class="form-label">Enter Verification Code</label>
+            <input type="text" name="ver_code" id="ver_code" class="form-control" placeholder="Enter 6-digit verification code" required>
+        </div>
+        <button type="submit" name="action" value="verify" class="btn btn-success w-100">Verify</button>
+        {% endif %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </form>
+</div>
+
+{% if checkcomplete %}
+<script>
+    alert("Signup Successful! Redirecting...");
+    window.location.href = "/creatorlogin/";
+</script>
+{% endif %}
+
+<script>
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+    btn.textContent = input.type === "password" ? "👁" : "🙈";
+}
+
+const fileInput = document.getElementById("file");
+const fileNameDisplay = document.getElementById("file-name");
+
+if (fileInput) {
+    fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (file && file.size > 2 * 1024 * 1024) {
+            alert("File size must be less than 2MB.");
+            fileInput.value = "";
+            fileNameDisplay.textContent = "No file chosen";
+        } else {
+            const fileName = file ? file.name : "No file chosen";
+            fileNameDisplay.innerHTML = fileName + " ✅";
+        }
+    });
+}
+</script>
+
+</body>
+</html>

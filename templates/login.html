@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/regen.css' %}">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Icon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Icon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'Icon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'Icon/site.webmanifest' %}">
+</head>
+<body>
+        <form method="post" class="form-1">
+            {% csrf_token %}
+            <img src="{% static 'Images/RETRE.png' %}">
+            <h2>Login To Your Account</h2>
+            <h6>First Rule Of RETRE is you do not talk about Retre.</h6>
+            <div class="input-group">
+            <p>UserName/Email:</p>
+                <input type="text" name="uname" required autocomplete="off"></div>
+            <div class="input-group sptr">
+            <p>Password:</p>
+                <input type="password" name="password" required autocomplete="off" ></div>
+
+            {% if check == False %}<div class="alert alert-danger">Incorrect Credentials</div>{% endif %}
+            <a href="/f-password-verify/">Forget Password</a>
+
+            <button type="submit" class="btn1">Login</button>
+        </form>
+        <form method="get" action="/signup/" class="form-2">
+            <h2>New To Our Website</h2>
+            <h6>Sign Up and Dive into the Platform</h6>
+            <p class="len1">A Platform Where You Can Learn,Train and Simulate Inceptions</p>
+            <button type="submit" class="btn2">Sign Up</button>
+        </form>
+</body>
+</html>

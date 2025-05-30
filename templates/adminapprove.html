@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>Review ML Projects</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'Icon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'Icon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'Icon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'Icon/site.webmanifest' %}">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="mb-4">Review ML Project Submissions</h2>
+    {% for project in projects %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-center"><strong>Project Name: </strong>{{ project.project_name }}</h5>
+                <p class="card-text"><strong>Description: </strong>{{ project.description }}</p>
+                <p><strong>Requirements:</strong> {{ project.requirements }}</p>
+                <p><strong>Submitted by:</strong> {{ project.creator.user.username }}</p>
+                <p><strong>Project ID:</strong> {{ project.id }}</p>
+                <p><strong>Status:</strong> {{ project.is_approved|yesno:"✅ Approved,❌ Not Approved" }}</p>
+                <a href="{% url 'download_project_file' project.id %}" class="btn btn-secondary btn-sm">Download File</a>
+                {% if not project.is_approved %}
+                    <a href="{% url 'approve_project' project.id %}" class="btn btn-success btn-sm">Approve</a>
+                    <a href="{% url 'reject_project' project.id %}" class="btn btn-danger btn-sm">Reject</a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No projects submitted yet.</p>
+    {% endfor %}
+    {% if msgsuccess == True%}
+    <script>
+        alert("Message Sent Successfully")
+    </script>
+    {% endif %}
+    {% if msgfail == True %}
+    <script>
+        alert("Message Not Sent. Re-try After Some Time")
+    </script>
+    {% endif %}
+</div>
+</body>
+</html>
