@@ -41,19 +41,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'service',
     'rest_framework',
-    'corsheaders', 
+    'corsheaders',
+    'cloudinary',
+    'cloudinary_storage',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 
 ]
 
@@ -151,6 +153,14 @@ CORS_ALLOWED_ORIGINS = [
 
 LOGIN_URL='/login/'
 ALLOWED_HOSTS = ['*']
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'retre.platform',
+    'API_KEY': '488484893788466',
+    'API_SECRET': 'PLoVoY8IqzBfBMKy3yUTPxVsaCc',
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 
 
