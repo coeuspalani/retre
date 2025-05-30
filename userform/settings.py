@@ -150,6 +150,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 LOGIN_URL='/login/'
+ALLOWED_HOSTS = ['*']
+
 
 
 
