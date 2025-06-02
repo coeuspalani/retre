@@ -55,7 +55,11 @@
         <button type="submit" name="action" value="verify" class="btn btn-success w-100">Verify</button>
         {% endif %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% if message.tags == 'error' %}
+            <div class="alert alert-danger">{{ message }}</div>
+            {% else %}
+            <div class="alert alert-success">{{ message }}</div>
+            {% endif %}
         {% endfor %}
     </form>
 </div>
@@ -90,6 +94,20 @@ if (fileInput) {
         }
     });
 }
+    let submitted = false;
+
+    document.addEventListener('submit', function (e) {
+        submitted = true;
+    });
+
+    window.addEventListener('beforeunload', function (e) {
+        if (!submitted) {
+            navigator.sendBeacon('/delete-temp-image/');
+        }
+    });
+    if (performance.navigation.type === 1) {
+        navigator.sendBeacon("/refresh-detected/");
+    }
 </script>
 
 </body>

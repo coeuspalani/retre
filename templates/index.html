@@ -27,14 +27,14 @@
         {% csrf_token %}
         {% if hidebar == False %}
         <p class="mrg">Username:</p>
-        <input type="text" placeholder="Enter Your Username" name="uname" value="{{ uname }}" required id="username" autocomplete="off" pattern="^[a-zA-Z0-9_]+$" title="Only letters, numbers, and underscores are allowed.">
+        <input type="text" placeholder="Enter Your Username" name="uname" value="{{ uname }}" required id="username" autocomplete="off" pattern="^[a-zA-Z0-9_]+$" class="ms-2" title="Only letters, numbers, and underscores are allowed.">
         <p>Mail ID:</p>
-        <input type="email" placeholder="Enter Your Mail ID" required id="mail" name="email" value="{{ email }}" autocomplete="off">
+        <input type="email" placeholder="Enter Your Mail ID" required id="mail" name="email" value="{{ email }}" class="ms-2" autocomplete="off">
         <p>Password:</p>
-        <input type="password" placeholder="Create Strong Password " required name="password" value="{{ password }}" autocomplete="off">
+        <input type="password" placeholder="Create Strong Password " required name="password" value="{{ password }}" class="ms-2" autocomplete="off">
         <p>Profile Image:</p>
         <section class="siu">
-            <input type="file" id="file" accept="image/*" class="file-input" name="image" {% if imagestatus == False %}required{% endif %}  autocomplete="off">
+            <input type="file" id="file" accept="image/*" class="file-input" name="image" {% if imagestatus == False %}required{% endif %} autocomplete="off">
             <label for="file" class="file-label">Choose File</label>
             <p class="file-name" id="file-name" >
                 {% if image %} {{ image.name }} &#9989;{% else %}No file chosen{% endif %}
@@ -43,7 +43,7 @@
         {% endif %}
         {% if ver == True %}
         <p>Enter the Verification Code Sent To Your Mail</p>
-        <input type="text" placeholder="Enter 6 digit Verification Code" {% if ver != False %}required{% endif %} name="inp_code" autocomplete="off">
+        <input type="text" placeholder="Enter 6 digit Verification Code" class="ms-2" required name="inp_code" autocomplete="off">
         {% endif %}
         {% if unamecheck == False %} <div class="alert alert-danger custom-danger"   id="uname">UserName Already Exists</div> {% endif %}
         {% if emailcheck == False %} <div class="alert alert-danger custom-danger" id="email">Email Already Exists</div> {% endif %}
@@ -96,7 +96,17 @@
             document.getElementsByName("email")[0].classList.toggle("u-danger")
        }
 
+    let submitted = false;
 
+    document.addEventListener('submit', function (e) {
+        submitted = true;
+    });
+
+    window.addEventListener('beforeunload', function (e) {
+        if (!submitted) {
+            navigator.sendBeacon('/delete-temp-image/');
+        }
+    });
 
     </script>
 

@@ -1,10 +1,13 @@
 import io
 import joblib
+import cloudinary.uploader
+import requests
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth import authenticate, login ,logout
 from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile, File
+from django.core.files.storage import default_storage, FileSystemStorage
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
@@ -20,8 +23,7 @@ import pandas as pd
 import pickle
 from django.http import FileResponse, Http404
 
-
-
+from userform import settings
 
 
 # ... your imports remain unchanged ...
@@ -65,7 +67,12 @@ def creator_required(view_func):
     return wrapper
 
 # Registration
+from django.core.exceptions import ValidationError
+
+
 def index(request):
+    local_storage = FileSystemStorage(location=os.path.join(settings.BASE_DIR, 'static', 'temp_images'))
+
     context = {
         'unamecheck': True,
         'emailcheck': True,
@@ -73,7 +80,8 @@ def index(request):
         'verstatus': True,
         'imagestatus': True,
         'sup': False,
-        'hidebar': False
+        'hidebar': False,
+        'result': ''
     }
 
     if request.method == "POST":
@@ -85,14 +93,7 @@ def index(request):
             password = request.POST.get('password')
             image = request.FILES.get('image')
 
-            if image:
-                path = f'temp_images/{os.path.basename(image.name)}'
-                default_storage.save(path, ContentFile(image.read()))
-                request.session['image_path'] = path
-
-            request.session.update({'uname': uname, 'email': email, 'password': password})
-
-            # Added role='general' correctly here:
+            # Username and Email Uniqueness Check
             if UserProfile.objects.filter(user__username=uname, role='general').exists():
                 context['unamecheck'] = False
                 return render(request, 'index.html', context)
@@ -100,48 +101,65 @@ def index(request):
                 context['emailcheck'] = False
                 return render(request, 'index.html', context)
 
-            ver_code = send_ver_code(email)
-            if not ver_code:
-                context.update({'hidebar': True})
-                messages.error(request, "Failed to send verification code. Retry")
+            try:
+                # Upload image to Cloudinary
+
+
+                # Send verification code to email
+                ver_code = send_ver_code(email)
+                if not ver_code:
+                    context.update({'hidebar': True})
+                    messages.error(request, "Failed to send verification code. Retry.")
+                    return render(request, 'index.html', context)
+                result = cloudinary.uploader.upload(image, folder="profile_pics")
+                image_url = result.get('secure_url')
+                request.session['public_id']=result.get('public_id')
+
+                # Create user & profile but only finalize after verification
+                user = User.objects.create_user(username=uname, email=email, password=password)
+                profile = UserProfile(user=user, role='general', image=image_url)
+                profile.save()
+
+                # Store temp data in session
+                request.session['uname'] = uname
+                request.session['ver_code'] = ver_code
+
+                context.update({'ver': True, 'verstatus': True, 'hidebar': True})
+                messages.success(request, "Verification code sent.")
                 return render(request, 'index.html', context)
 
-            request.session['ver_code'] = ver_code
-            context.update({'ver': True, 'verstatus': True, 'hidebar': True})
-            messages.success(request, "Verification code sent.")
-            return render(request, 'index.html', context)
+            except cloudinary.exceptions.Error as e:
+                messages.error(request, f"Image upload failed: {str(e)}")
+                context['imagestatus'] = False
+                return render(request, 'index.html', context)
+
+            except IntegrityError:
+                messages.error(request, "User already exists. Please try a different username or email.")
+                return render(request, 'index.html', context)
+
+            except Exception as e:
+                messages.error(request, f"Unexpected error: {str(e)}")
+                return render(request, 'index.html', context)
 
         elif action == 'submit':
-            if request.POST.get('inp_code') != request.session.get('ver_code'):
+            input_code = request.POST.get('inp_code')
+            session_code = request.session.get('ver_code')
+
+            if input_code != session_code:
                 messages.error(request, "Invalid verification code.")
-                context.update({'ver': False, 'verstatus': False})
+                context.update({'ver': True, 'verstatus': True,'hidebar':True})
                 return render(request, 'index.html', context)
 
+            # Finalize registration
             request.session.pop('ver_code', None)
-
-            uname = request.session.get('uname')
-            email = request.session.get('email')
-            password = request.session.get('password')
-
-            image = None
-            if 'image_path' in request.session:
-                path = request.session.pop('image_path')
-                with default_storage.open(path) as img:
-                    image = ContentFile(img.read(), name=os.path.basename(path))
-
-            try:
-                user = User.objects.create_user(username=uname, email=email, password=password)
-                # Added role='general' here:
-                UserProfile.objects.create(user=user, image=image, role='general')
-            except IntegrityError:
-                messages.error(request, "Registration failed. Try a different username or email.")
-                return render(request, 'index.html', context)
-
+            request.session.pop('uname', None)
+            request.session.pop('public_id', None)
             messages.success(request, "Registration successful.")
             context['sup'] = True
             return render(request, 'index.html', context)
 
     return render(request, 'index.html', context)
+
 
 # Login
 def loginpage(request):
@@ -229,87 +247,98 @@ def newpassword(request):
 
 # Creator Signup
 def creatorsignup(request):
-    context = {'hidebar': True, 'emailcheck': False, 'unamecheck': False, 'checkcomplete': False}
+    if request.COOKIES.get('was_refreshed') == 'true':
+        response = redirect(request.path)
+        response.delete_cookie('was_refreshed')  # Remove cookie after use
+        return response
+    context = {
+        'hidebar': True,
+        'emailcheck': False,
+        'unamecheck': False,
+        'checkcomplete': False,
+        'ver': False,
+        'verstatus': True,
+        'imagestatus': True
+    }
+
     if request.method == "POST":
         action = request.POST.get('action')
-
         if action == 'req':
             uname = request.POST.get('uname')
             email = request.POST.get('email')
             password = request.POST.get('password')
             image = request.FILES.get('image')
 
-            # Added role='creator' filtering:
             uname_exists = User.objects.filter(username=uname).exists()
             email_exists = User.objects.filter(email=email).exists()
 
             if uname_exists:
                 messages.error(request, "Creator with this Username already exists.")
-                context.update({'hidebar': True, 'unamecheck': True})
+                context['unamecheck'] = True
                 return render(request, 'creatorsignup.html', context)
+
             if email_exists:
-                context.update({'hidebar': True, 'emailcheck': True})
                 messages.error(request, "Creator with this Email already exists.")
+                context['emailcheck'] = True
                 return render(request, 'creatorsignup.html', context)
 
-            if image:
-                path = f'temp_images/{os.path.basename(image.name)}'
-                default_storage.save(path, ContentFile(image.read()))
-                request.session['image_path'] = path
+            try:
 
-            request.session['cuname'] = uname
-            request.session['cemail'] = email
-            request.session['cpassword'] = password
 
-            send_code = send_ver_code(email)
-            if send_code is None:
-                context.update({'hidebar': True})
-                messages.error(request, "Error Sending Verification Code, Retry")
+                ver_code = send_ver_code(email)
+                if not ver_code:
+                    messages.error(request, "Failed to send verification code. Retry.")
+                    return render(request, 'creatorsignup.html', context)
+                result = cloudinary.uploader.upload(image, folder="profile_pics")
+                image_url = result.get('secure_url')
+                request.session['public_id']=result.get('public_id')
+
+                user = User.objects.create_user(username=uname, email=email, password=password)
+                profile = UserProfile(user=user, role='creator', image=image_url)
+                profile.save()
+
+                request.session['uname'] = uname
+                request.session['ac_code'] = ver_code
+
+                context.update({'ver': True, 'verstatus': True, 'hidebar': False})
+                messages.success(request, "Verification code sent to your email.")
                 return render(request, 'creatorsignup.html', context)
 
-            request.session['ac_code'] = send_code
-            messages.success(request, "Verification Code Sent Successfully")
-            context.update({'hidebar': False})
-            return render(request, 'creatorsignup.html', context)
+            except cloudinary.exceptions.Error as e:
+                messages.error(request, f"Image upload failed: {str(e)}")
+                context['imagestatus'] = False
+                return render(request, 'creatorsignup.html', context)
+
+            except IntegrityError:
+                messages.error(request, "User already exists. Try a different username or email.")
+                return render(request, 'creatorsignup.html', context)
+
+            except Exception as e:
+                messages.error(request, f"Unexpected error: {str(e)}")
+                return render(request, 'creatorsignup.html', context)
 
         elif action == 'verify':
+            request.session['form_submitted'] = True
             ver_code = request.POST.get('ver_code')
             ch_code = request.session.get('ac_code')
+
 
             if ver_code != ch_code:
                 messages.error(request, "Incorrect verification code, retry.")
                 context.update({'hidebar': False})
                 return render(request, 'creatorsignup.html', context)
 
-            cuname = request.session.get('cuname')
-            cemail = request.session.get('cemail')
-            cpassword = request.session.get('cpassword')
-
-            image = None
-            if 'image_path' in request.session:
-                path = request.session.pop('image_path')
-                with default_storage.open(path, 'rb') as img_file:
-                    image = ContentFile(img_file.read(), name=os.path.basename(path))
-
-            try:
-                # Create user with password correctly
-                creator = User.objects.create_user(username=cuname, email=cemail, password=cpassword)
-                # Add role='creator' here
-                fcreator = UserProfile.objects.create(user=creator, image=image, role='creator')
-                # If you have profile_image field on creator model, save here (optional)
-                fcreator.save()
-                login(request,creator)
-            except IntegrityError:
-                context.update({'hidebar': True})
-                messages.error(request, "Registration failed. Try a different username or email.")
-                return render(request, 'creatorsignup.html', context)
-
+            # Clear session after success
+            request.session.pop('ac_code', None)
+            request.session.pop('public_id',None)
+            request.session.pop('uname',None)
+            request.session.pop('form_submitted',None)
             context.update({'checkcomplete': True})
             messages.success(request, "Registration successful.")
-
             return render(request, 'creatorsignup.html', context)
 
     return render(request, 'creatorsignup.html', context)
+
 
 @creator_required
 def upload_project(request):
@@ -329,7 +358,7 @@ def upload_project(request):
         )
 
         for file in files:
-            MLProjectFile.objects.create(project=project, file=file)
+            MLProjectFile.objects.create(project=project, project_file=file)
 
         return render(request, 'allmlproj.html', {'checkcomplete': True})
 
@@ -345,34 +374,31 @@ def adminsignup(request):
         password = request.POST.get('password')
         image = request.FILES.get('image')
 
-        # Check if username or email already exists with role 'admin'
-        if UserProfile.objects.filter(user__username=uname, role='admin').exists():
-            messages.error(request, "Admin with this username already exists.")
-            return render(request, 'adminsignup.html')
-        if UserProfile.objects.filter(user__email=email, role='admin').exists():
-            messages.error(request, "Admin with this email already exists.")
+        # 🔒 Check if username or email exists in the User model
+        if User.objects.filter(username=uname).exists():
+            messages.error(request, "Username already exists.")
             return render(request, 'adminsignup.html')
 
-        # Save image temporarily if exists
-        img_file = None
-        if image:
-            path = f'temp_images/{os.path.basename(image.name)}'
-            default_storage.save(path, ContentFile(image.read()))
-            with default_storage.open(path, 'rb') as img_open:
-                img_file = ContentFile(img_open.read(), name=os.path.basename(path))
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return render(request, 'adminsignup.html')
 
-        # Create user and profile with role='admin'
+        result = cloudinary.uploader.upload(image, folder="profile_pics")
+        img_file = result.get('secure_url')
+
+        # ✅ Create user and profile with role='admin'
         user = User.objects.create_user(username=uname, email=email, password=password)
-        user.is_staff = True  # allows access to admin panel
-        user.is_superuser = False  # adjust as needed
+        user.is_staff = True
+        user.is_superuser = True
         user.save()
 
         UserProfile.objects.create(user=user, image=img_file, role='admin')
 
         messages.success(request, "Admin registered successfully.")
-        return redirect('/login/')  # or any other page
+        return redirect('/login/')
 
     return render(request, 'adminsignup.html')
+
 def creator_login(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -470,7 +496,7 @@ def use_project(request, project_id):
 
     # Get all files related to this project
     project_files = MLProjectFile.objects.filter(project=project)
-    if project_id == 5:
+    if project_id == 10:
     # Load the required files
         preprocessor = None
         model = None
@@ -478,7 +504,7 @@ def use_project(request, project_id):
 
         for file in project_files:
             filename = os.path.basename(file.project_file.name)
-            path = file.project_file.path
+            path = file.project_file
 
             if 'model' in filename and filename.endswith('.pkl'):
                 model = joblib.load(path)
@@ -488,7 +514,7 @@ def use_project(request, project_id):
                 target_scaler = joblib.load(path)
 
     if request.method == 'POST':
-        if project_id == 5:
+        if project_id == 10:
             age = float(request.POST.get('age'))
             sex = request.POST.get('sex')
             bmi = float(request.POST.get('bmi'))
@@ -544,27 +570,63 @@ def get_model(project_id):
 
 
 
-
 @staff_member_required
 def download_project_file(request, project_id):
     project = get_object_or_404(MLProject, id=project_id)
-    files = project.files.all()  # Using the related_name="files" in your ForeignKey
+    files = project.files.all()
 
     if not files:
         raise Http404("No files found for this project.")
 
-    # Create a ZIP file in memory
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
         for f in files:
-            file_path = f.project_file.path
-            filename = os.path.basename(file_path)
-            zip_file.write(file_path, arcname=filename)
+            print(files)
+            public_id = f.project_file.name  # e.g. 'ml_projects/Prediction_Model_files_1_pqsaei.zip'
+            filename = os.path.basename(public_id)
+            file_url=f.project_file.url
+
+            try:
+                response = requests.get(file_url)
+                response.raise_for_status()
+                zip_file.writestr(filename, response.content)
+            except requests.RequestException as e:
+                raise Http404(f"Error downloading file {filename}: {str(e)}")
 
     zip_buffer.seek(0)
     response = HttpResponse(zip_buffer, content_type='application/zip')
     response['Content-Disposition'] = f'attachment; filename="{project.project_name}_files.zip"'
     return response
 
+
+
 def aboutus(request):
     return render(request, 'aboutus.html', {'current_year': timezone.now().year})
+def delete_cloudinary_file(public_id):
+    result = cloudinary.uploader.destroy(public_id)
+    return result
+
+@csrf_exempt
+def delete_temp_image(request):
+    if request.method == "POST":
+        public_id = request.session.get('public_id')
+        uname=request.session.pop('uname',None)
+        print(public_id)
+        if public_id:
+            try:
+                User.objects.filter(username=uname).delete()
+                cloudinary.uploader.destroy(public_id)
+                request.session.pop('public_id', None)
+                return JsonResponse({'status': 'success'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
+        return JsonResponse({'status': 'no_image'})
+
+
+@csrf_exempt
+def refresh_detected(request):
+    response = HttpResponse("OK")
+    response.set_cookie('was_refreshed', 'true', max_age=10)  # short expiry
+    return response
+
+

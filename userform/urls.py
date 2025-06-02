@@ -43,6 +43,10 @@ urlpatterns = [
     path('use_project/<int:project_id>/',views.use_project),
     path('download_project/<int:project_id>/', views.download_project_file, name='download_project_file'),
     path('aboutus/',views.aboutus),
+    path('delete-temp-image/', views.delete_temp_image, name='delete_temp_image'),
+    path("refresh-detected/", views.refresh_detected, name="refresh_detected"),
+
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

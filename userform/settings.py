@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+
+
 from django.conf.global_settings import LOGIN_URL, LOGIN_REDIRECT_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +29,7 @@ SECRET_KEY = 'django-insecure-6m!yo++un4tx6f1#+u0dz)t7=8nyt1cf6gi8ei#%c456&cq&tj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -144,22 +146,22 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'retre.platform@gmail.com'
 EMAIL_HOST_PASSWORD = 'pkvbthukammwlllu'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
 LOGIN_URL='/login/'
-ALLOWED_HOSTS = ['*']
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'retre.platform',
+    'CLOUD_NAME': 'dnibeqxbz',
     'API_KEY': '488484893788466',
     'API_SECRET': 'PLoVoY8IqzBfBMKy3yUTPxVsaCc',
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+
 
 
 

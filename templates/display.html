@@ -77,7 +77,7 @@
         {% if user.userprofile.image %}
           <img src="{{ user.userprofile.image.url }}" alt="Profile" class="profile-img dropdown-toggle" data-bs-toggle="dropdown">
         {% else %}
-          <img src="{{ MEDIA_URL }}profile_pic/default.png" alt="Profile" class="profile-img dropdown-toggle" data-bs-toggle="dropdown">
+          <img src='https://res.cloudinary.com/dnibeqxbz/image/upload/v1748683657/default_eqwi5z.jpg' alt="Profile" class="profile-img dropdown-toggle" data-bs-toggle="dropdown">
         {% endif %}
 
         <ul class="dropdown-menu dropdown-menu-end">
@@ -100,7 +100,7 @@
           {% endif %}
         </ul>
       {% else %}
-        <img src="{{ MEDIA_URL }}profile_pic/default.png" alt="Profile" class="profile-img dropdown-toggle" data-bs-toggle="dropdown">
+        <img src="https://res.cloudinary.com/dnibeqxbz/image/upload/v1748683657/default_eqwi5z.jpg" alt="Profile" class="profile-img dropdown-toggle" data-bs-toggle="dropdown">
          <ul class="dropdown-menu dropdown-menu-end">
            <li><a class="dropdown-item text-primary" href="/login/">Login</a></li>
          </ul>
@@ -129,7 +129,7 @@
                 <img src="{{ project.creator.image.url }}" alt="Profile" class="profile-img dropdown-toggle"  style="width: 30px; height: 30px; cursor: pointer;"
                    data-bs-toggle="modal" data-bs-target="#creatorModal" data-creator-id="{{ project.creator.id }}">
               {% else %}
-                <img src="{{ MEDIA_URL }}profile_pic/default.png" alt="Profile" class="profile-img dropdown-toggle"  style="width: 30px; height: 30px; cursor: pointer;"
+                <img src="https://res.cloudinary.com/dnibeqxbz/image/upload/v1748683657/default_eqwi5z.jpg" alt="Profile" class="profile-img dropdown-toggle"  style="width: 30px; height: 30px; cursor: pointer;"
                    data-bs-toggle="modal" data-bs-target="#creatorModal" data-creator-id="{{ project.creator.id }}">
               {% endif %}
               <small class="ms-2"> {{ project.creator.user.username }}</small>

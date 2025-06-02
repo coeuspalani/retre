@@ -110,6 +110,21 @@
       box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
       outline: none;
     }
+    .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
   </style>
 </head>
 <body>
@@ -196,6 +211,9 @@
       </div>
 
       <button type="submit" class="btn btn-primary">Predict</button>
+      <div class="back-link">
+            <a href="/">← Go back to profile</a>
+      </div>
     </form>
 
     {% else %}
