@@ -136,10 +136,33 @@
             width: 50%;
             margin:5px auto;
         }
-        @media (max-width:600px) {
-            #frm
-            {
-                width:80%;
-            }
+        @media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        height: auto;
+    }
 
-        }
+    .form-1,
+    .form-2 {
+        width: 100% !important;
+        height: auto !important;
+        padding: 20px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .form-2 {
+        order: -1; /* Optional: moves it above form-1 */
+    }
+
+    form {
+        width: 100%;
+        padding: 10px;
+    }
+
+    input,
+    button {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
