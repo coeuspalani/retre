@@ -1,0 +1,57 @@
+/* Container box styling */
+.container-box {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    background-color: #f8f9fa;
+}
+
+/* Danger border for inputs */
+.u-danger {
+    border-color: red;
+}
+
+/* File input name display */
+.file-name {
+    font-size: 0.9em;
+    margin-top: 5px;
+    color: #333;
+}
+
+/* Alert message styles */
+.alert {
+    padding: 10px 15px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Django message tag styling */
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger,
+.alert-error {  /* error and danger treated the same */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}

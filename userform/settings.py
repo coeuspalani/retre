@@ -13,7 +13,10 @@ import os
 from pathlib import Path
 
 
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://retre-platform-291478908696.asia-south1.run.app",
+]
 from django.conf.global_settings import LOGIN_URL, LOGIN_REDIRECT_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,9 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6m!yo++un4tx6f1#+u0dz)t7=8nyt1cf6gi8ei#%c456&cq&tj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+DEBUG = False
 
 
 # Application definition
@@ -148,9 +149,6 @@ EMAIL_HOST_USER = 'retre.platform@gmail.com'
 EMAIL_HOST_PASSWORD = 'pkvbthukammwlllu'
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
 
 LOGIN_URL='/login/'
 
@@ -163,8 +161,18 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
+PORT = int(os.environ.get('PORT', 8080))
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://retre-platform-291478908696.asia-south1.run.app"
+]
+ALLOWED_HOSTS = ["retre-platform-291478908696.asia-south1.run.app"]
+
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 
 
