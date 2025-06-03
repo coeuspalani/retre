@@ -168,7 +168,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 CSRF_TRUSTED_ORIGINS = [
     "https://retre-platform-291478908696.asia-south1.run.app"
 ]
-ALLOWED_HOSTS = ["retre-platform-291478908696.asia-south1.run.app"]
+ALLOWED_HOSTS = ["retre-platform-291478908696.asia-south1.run.app","https://retre-platform-mlhub.onrender.com"]
 
 
 CSRF_COOKIE_SECURE = True
